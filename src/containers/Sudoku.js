@@ -24,15 +24,101 @@ class Sudoku extends Component {
 
     handle_grid_1x1_click = (row_index, col_index) => {
         // TODO
+        var last_grid = document.getElementById("grid-"+String(this.state.selectedGrid.row_index)+"*"+String(this.state.selectedGrid.col_index));
+        if(last_grid !== null){
+            last_grid.style.backgroundColor =  "";
+            last_grid.style.color =  "#6cc";
+        }
+        
+        var grid = document.getElementById("grid-"+String(row_index)+"*"+String(col_index));
+        if(typeof(this.state.gridValues[row_index][col_index]) === 'number' || (this.state.gridValues[row_index][col_index] === '0')){
+            this.setState((state)=>{
+                let newSelect = { row_index: row_index, col_index: col_index };
+                return {selectedGrid:newSelect};
+            });
+            grid.style.backgroundColor =  "#333";
+            grid.style.color = "#FFF";
+        }
+            
+            
+            
 
-        // Useful hints:
-        // console.log(row_index, col_index)
-        // console.log(this.state.selectedGrid)
+        
+        
+        // // Useful hints:
+        // console.log(this.state.selectedGrid);
     }
-
+    isValid = (num) => {
+        this.setState((state)=>{
+            return {conflicts: [{ row_index: -1, col_index: -1 }]};
+        });
+        for(let i = 0;i<9;i++){
+            if(Number(this.state.gridValues[this.state.selectedGrid.row_index][i]) === num){
+                this.setState((state)=>{
+                    let newConflict = [];
+                    if(state.conflicts[0].row_index !== -1) newConflict = state.conflicts;
+                    newConflict.push({ row_index: this.state.selectedGrid.row_index, col_index: i });
+                    return {conflicts: newConflict};
+                });
+            }
+            if(Number(this.state.gridValues[i][this.state.selectedGrid.col_index]) === num){
+                this.setState((state)=>{
+                    let newConflict = [];
+                    if(state.conflicts[0].row_index !== -1) newConflict = state.conflicts;
+                    newConflict.push({ row_index: i, col_index: this.state.selectedGrid.col_index });
+                    return {conflicts: newConflict};
+                });
+            }
+        }
+        var col_num = Math.floor(this.state.selectedGrid.col_index/3);
+        var row_num = Math.floor(this.state.selectedGrid.row_index/3);
+        
+        for(let i = 0;i<3;i++){
+            for(let j = 0;j<3;j++){
+                if(Number(this.state.gridValues[3*row_num + i][3*col_num + j]) === num) {
+                    this.setState((state)=>{
+                        let newConflict = [];
+                        if(state.conflicts[0].row_index !== -1) newConflict = state.conflicts;
+                        newConflict.push({ row_index: 3*row_num + i, col_index: 3*col_num + j });
+                        return {conflicts: newConflict};
+                    });
+                }
+            }
+        }
+        if(this.state.conflicts[0].row_index !== -1) {
+            this.Error();
+            return false;
+        }
+        return true;
+    }
+    Error = () => {
+        //this.setState({ gameBoardBorderStyle: "8px solid #E77" });
+        //setTimeout(() => { this.setState({ gameBordBoarderStyle: "8px solid #333" }); }, 1000);
+    }
     handleKeyDownEvent = (event) => {
         // TODO
-
+        if(event.keyCode <= 57 && event.keyCode >= 48){
+            if(event.keyCode === 48){
+                var cur_grid = document.getElementById("grid-"+String(this.state.selectedGrid.row_index)+"*"+String(this.state.selectedGrid.col_index));
+                if(cur_grid === null) return;
+                this.setState((state)=>{
+                    let new_grid = state.gridValues;
+                    new_grid[this.state.selectedGrid.row_index][this.state.selectedGrid.col_index] = '0';
+                    return {gridValues:new_grid};
+                })
+                return ;
+            }
+            if(!this.isValid(event.keyCode - 48)) return;
+            var cur_grid = document.getElementById("grid-"+String(this.state.selectedGrid.row_index)+"*"+String(this.state.selectedGrid.col_index));
+            if(cur_grid === null) return;
+            this.setState((state)=>{
+                let new_grid = state.gridValues;
+                new_grid[this.state.selectedGrid.row_index][this.state.selectedGrid.col_index] = event.keyCode - 48;
+                return {gridValues:new_grid};
+            })
+            //cur_grid.style.color = "#FFF";
+        }
+        //console.log(event.keyCode);
         // Useful hints:
         // console.log(event)
         // if (this.state.gridValues !== null && this.state.selectedGrid.row_index !== -1 && this.state.selectedGrid.col_index !== -1 && (event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <= 105)) {}
@@ -41,6 +127,25 @@ class Sudoku extends Component {
 
     handleScreenKeyboardInput = (num) => {
         // TODO
+        if(num === 0){
+            var cur_grid = document.getElementById("grid-"+String(this.state.selectedGrid.row_index)+"*"+String(this.state.selectedGrid.col_index));
+            if(cur_grid === null) return;
+            this.setState((state)=>{
+                let new_grid = state.gridValues;
+                new_grid[this.state.selectedGrid.row_index][this.state.selectedGrid.col_index] = '0';
+                return {gridValues:new_grid};
+            })
+            return ;
+
+        }
+        var cur_grid = document.getElementById("grid-"+String(this.state.selectedGrid.row_index)+"*"+String(this.state.selectedGrid.col_index));
+        if(cur_grid === null) return;
+        this.setState((state)=>{
+            let new_grid = state.gridValues;
+            new_grid[this.state.selectedGrid.row_index][this.state.selectedGrid.col_index] = num;
+            return {gridValues:new_grid};
+        })
+        
     }
 
     componentDidMount = () => {
