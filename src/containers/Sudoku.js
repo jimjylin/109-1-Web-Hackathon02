@@ -86,19 +86,18 @@ class Sudoku extends Component {
             }
         }
         if(this.state.conflicts[0].row_index !== -1) {
-            this.Error();
             return false;
         }
+        
         return true;
     }
-    Error = () => {
-        //this.setState({ gameBoardBorderStyle: "8px solid #E77" });
-        //setTimeout(() => { this.setState({ gameBordBoarderStyle: "8px solid #333" }); }, 1000);
-    }
+    
     handleKeyDownEvent = (event) => {
         // TODO
-        if(event.keyCode <= 57 && event.keyCode >= 48){
-            if(event.keyCode === 48){
+        let code = event.keyCode;
+        if(code >= 96 && code <= 105) code = code - 48;
+        if(code <= 57 && code >= 48){
+            if(code === 48){
                 var cur_grid = document.getElementById("grid-"+String(this.state.selectedGrid.row_index)+"*"+String(this.state.selectedGrid.col_index));
                 if(cur_grid === null) return;
                 this.setState((state)=>{
@@ -108,7 +107,7 @@ class Sudoku extends Component {
                 })
                 return ;
             }
-            if(!this.isValid(event.keyCode - 48)) return;
+            if(!this.isValid(code - 48)) return;
             var cur_grid = document.getElementById("grid-"+String(this.state.selectedGrid.row_index)+"*"+String(this.state.selectedGrid.col_index));
             if(cur_grid === null) return;
             this.setState((state)=>{
@@ -192,6 +191,8 @@ class Sudoku extends Component {
                 y: window.innerHeight * Math.random()
             })
         }
+        
+
         return (
             <>
                 <Header problemList={problemList} loadProblem={this.loadProblem} gridValues={this.state.gridValues} problem={this.state.problem} />
